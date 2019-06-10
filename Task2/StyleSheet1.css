@@ -1,4 +1,8 @@
-﻿#results {
+﻿table, th, td {
     border-collapse: collapse;
     border: 1px solid black;
+}
+
+th, td {
+    padding: 15px;
 }
