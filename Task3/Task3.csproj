@@ -47,6 +47,11 @@
     <Compile Include="ApplicationForm.aspx.designer.cs">
       <DependentUpon>ApplicationForm.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="ContactPerson.cs" />
+    <Compile Include="DAL.cs" />
+    <Compile Include="Email.cs" />
+    <Compile Include="Language.cs" />
+    <Compile Include="ListItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
