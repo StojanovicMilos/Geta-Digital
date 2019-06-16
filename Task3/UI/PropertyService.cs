@@ -2,14 +2,14 @@
 
 namespace Task3.UI
 {
-    public class PropertyService
+    public class PropertyService : IPropertyService
     {
-        public static string GetPageDataPropertyLinkUrl(CurrentPage currentPage, string formreceiptpage)
+        public string GetPageDataPropertyLinkUrl(CurrentPage currentPage, string formName)
         {
             throw new NotImplementedException();
         }
 
-        public static string GetStringProperty(CurrentPage currentPage, string emailsubject)
+        public string GetStringProperty(CurrentPage currentPage, string emailSubject)
         {
             throw new NotImplementedException();
         }

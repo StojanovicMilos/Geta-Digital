@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BL\AttachmentFile.cs" />
     <Compile Include="BL\EPiServer.cs" />
     <Compile Include="BL\ILanguage.cs" />
     <Compile Include="BL\StringValidationUtil.cs" />
@@ -61,11 +62,11 @@
     <Compile Include="DAL\ListItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\CurrentPage.cs" />
+    <Compile Include="UI\IPropertyService.cs" />
     <Compile Include="UI\Page.cs" />
     <Compile Include="UI\Property.cs" />
     <Compile Include="UI\PropertyService.cs" />
     <Compile Include="UI\PropertyValue.cs" />
-    <Compile Include="UI\Request.cs" />
     <Compile Include="UI\Response.cs" />
     <Compile Include="UI\TemplatePageBase.cs">
       <SubType>ASPXCodeBehind</SubType>

@@ -5,10 +5,9 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using Legacy.Web.Templates.Pages;
-using Task3.BL;
 using Task3.DAL;
 
-namespace Task3
+namespace Task3.BL
 {
     public class Email : IEmail
     {
@@ -217,13 +216,5 @@ namespace Task3
     {
         string GetEmailForMunicipality(string selectedValue);
         bool SendMail(string subject, ContactPerson details, List<AttachmentFile> attachments, string applicationReceiver, string applicationSender, string emailHeader);
-    }
-
-    public class AttachmentFile
-    {
-        public int ContentLength { get; set; }
-        public string FileName { get; set; }
-        public Stream InputStream { get; set; }
-        public string ContentType { get; set; }
     }
 }
