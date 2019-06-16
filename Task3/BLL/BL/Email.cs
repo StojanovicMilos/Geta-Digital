@@ -12,12 +12,10 @@ namespace Task3.BLL.BL
     public class Email : IEmail
     {
         private readonly ILanguage _language;
-        private readonly IStringValidationUtility _stringValidationUtility;
 
-        public Email(ILanguage language, IStringValidationUtility stringValidationUtility)
+        public Email(ILanguage language)
         {
             _language = language ?? throw new ArgumentNullException(nameof(language));
-            _stringValidationUtility = stringValidationUtility ?? throw new ArgumentNullException(nameof(stringValidationUtility));
         }
 
         public bool SendMail(EmailData data)
@@ -67,67 +65,31 @@ namespace Task3.BLL.BL
 
         private MailMessage BuildMail(string content, EmailData data)
         {
-            string toAddresses = data.ApplicationReceiver;
-            string subject = data.Subject;
-            string fromAdress = data.ApplicationSender;
-            string bccAddress = data.Bcc;
-            Attachment[] attachmentCol = GetAttachments(data.Attachments);
-
-            //Receipents
-            MailAddressCollection recipients = new MailAddressCollection();
-
-            if (toAddresses.Contains(";"))
-            {
-                string[] addresses = toAddresses.Split(';');
-
-                foreach (string s in addresses)
-                {
-                    if (!s.StartsWith(";"))
-                    {
-                        recipients.Add(s);
-                    }
-                }
-            }
-            else
-            {
-                recipients.Add(toAddresses);
-            }
-
-            //From
-            MailAddress from = new MailAddress(fromAdress, fromAdress);
+            if (data == null) throw new ArgumentNullException(nameof(data));
             MailMessage mail = new MailMessage();
 
-            //To
-            foreach (MailAddress attendee in recipients)
+            mail.Body = content ?? throw new ArgumentNullException(nameof(content));
+            mail.Subject = data.Subject;
+            mail.From = new MailAddress(data.ApplicationSender, data.ApplicationSender);
+            foreach (var attendee in data.EmailReceivers)
             {
                 mail.To.Add(attendee);
             }
 
-            mail.From = from;
-            mail.Subject = subject;
-            mail.Body = content;
-
-            if (!string.IsNullOrEmpty(bccAddress))
+            foreach (var bcc in data.Bcc)
             {
-                mail.Bcc.Add(bccAddress);
+                mail.Bcc.Add(bcc);
             }
 
-            //Attachment
-            if (attachmentCol != null)
+            foreach (Attachment attachment in GetAttachments(data.Attachments))
             {
-                foreach (Attachment attachment in attachmentCol)
-                {
-                    if (attachment != null)
-                    {
-                        mail.Attachments.Add(attachment);
-                    }
-                }
+                mail.Attachments.Add(attachment);
             }
 
             return mail;
         }
 
-        public Attachment[] GetAttachments(List<AttachmentFile> files) =>
+        private Attachment[] GetAttachments(List<AttachmentFile> files) =>
             (from file in files.Where(f => f != null && f.ContentLength > 0)
                 let fileName = Path.GetFileName(file.FileName)
                 where fileName != string.Empty
@@ -136,41 +98,17 @@ namespace Task3.BLL.BL
 
         private bool SendMail(MailMessage mail, bool isBodyHtml)
         {
-            SmtpClient smtp = new SmtpClient();
-            mail.IsBodyHtml = isBodyHtml;
-            bool retStatus = false;
-
-            if (mail.To.Count > 0 && mail.From.ToString().Length > 0 && mail.Subject.Length > 0)
+            try
             {
-                try
-                {
-                    bool ok = true;
-                    foreach (MailAddress singleToAddress in mail.To)
-                    {
-                        if (!_stringValidationUtility.IsValidEmailAddress(singleToAddress.Address))
-                        {
-                            ok = false;
-                        }
-                    }
-
-                    if (ok)
-                    {
-                        //Send mail
-                        smtp.Send(mail);
-                        retStatus = true;
-                    }
-
-                    //Returns true if successful
-                    return retStatus;
-
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
+                SmtpClient smtp = new SmtpClient();
+                mail.IsBodyHtml = isBodyHtml;
+                smtp.Send(mail);
+                return true;
             }
-
-            return false;
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Task3.BLL.BL
 {
-    public class StringValidationUtility : IStringValidationUtility
+    public class EmailAddressValidationUtility : IEmailAddressValidationUtility
     {
         public bool IsValidEmailAddress(string address)
         {

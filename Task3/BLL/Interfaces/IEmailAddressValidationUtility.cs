@@ -1,6 +1,6 @@
 ﻿namespace Task3.BLL.Interfaces
 {
-    public interface IStringValidationUtility
+    public interface IEmailAddressValidationUtility
     {
         bool IsValidEmailAddress(string address);
     }

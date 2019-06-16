@@ -46,8 +46,8 @@
     <Compile Include="BLL\Interfaces\IContactPersonDAO.cs" />
     <Compile Include="BLL\Interfaces\IEmail.cs" />
     <Compile Include="BLL\Interfaces\ILanguage.cs" />
-    <Compile Include="BLL\Interfaces\IStringValidationUtility.cs" />
-    <Compile Include="BLL\BL\StringValidationUtility.cs" />
+    <Compile Include="BLL\Interfaces\IEmailAddressValidationUtility.cs" />
+    <Compile Include="BLL\BL\EmailAddressValidationUtility.cs" />
     <Compile Include="BLL\Interfaces\ICountryListDAO.cs" />
     <Compile Include="DAL\ContactPersonDAO.cs" />
     <Compile Include="UI\ApplicationForm.aspx.cs">

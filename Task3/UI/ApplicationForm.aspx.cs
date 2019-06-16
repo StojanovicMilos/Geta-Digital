@@ -15,15 +15,17 @@ namespace Task3.UI
         private readonly IPropertyService _propertyService;
         private readonly IContactPersonUtility _contactPersonUtility;
         private readonly ICountryUtility _countryUtility;
+        private readonly IEmailAddressValidationUtility _emailAddressValidationUtility;
 
         // ReSharper disable once RedundantBaseConstructorCall
-        public ApplicationForm(ILanguage language, IEmail email, IPropertyService propertyService, IContactPersonUtility contactPersonUtility, ICountryUtility countryUtility) : base()
+        public ApplicationForm(ILanguage language, IEmail email, IPropertyService propertyService, IContactPersonUtility contactPersonUtility, ICountryUtility countryUtility, IEmailAddressValidationUtility emailAddressValidationUtility) : base()
         {
             _language = language ?? throw new ArgumentNullException(nameof(language));
             _email = email ?? throw new ArgumentNullException(nameof(email));
             _propertyService = propertyService ?? throw new ArgumentNullException(nameof(propertyService));
             _contactPersonUtility = contactPersonUtility ?? throw new ArgumentNullException(nameof(contactPersonUtility));
             _countryUtility = countryUtility ?? throw new ArgumentNullException(nameof(countryUtility));
+            _emailAddressValidationUtility = emailAddressValidationUtility ?? throw new ArgumentNullException(nameof(emailAddressValidationUtility));
         }
 
         protected override void OnLoad(EventArgs e)
@@ -70,7 +72,7 @@ namespace Task3.UI
             if (!Page.IsValid)
                 return;
 
-            EmailData emailData = GetEmailDataFromUI();
+            EmailData emailData = GetEmailData();
             bool emailSent = _email.SendMail(emailData);
 
             var redirectFormName = emailSent ? "FormReceiptPage" : "FormErrorPage";
@@ -78,35 +80,44 @@ namespace Task3.UI
             Response.Redirect(redirectUrl);
         }
 
-        private EmailData GetEmailDataFromUI() => new EmailData
-        {
-            Subject = _propertyService.GetStringProperty(CurrentPage, "EmailSubject"),
-            ApplicationReceiver = GetEmailForMunicipality(Ddl_Municipality.SelectedValue),
-            ApplicationSender = Txt_Email.Text,
-            Attachments = ConvertToAttachmentFiles(Request.Files),
-            County = Ddl_County.SelectedValue,
-            Municipality = Ddl_Municipality.SelectedValue,
-            EmailHeader = _propertyService.GetStringProperty(CurrentPage, "EmailHeader"),
-            EmailFooter = _propertyService.GetStringProperty(CurrentPage, "EmailFooter"),
-            Applicator = Txt_Applicator.Text,
-            Address = Txt_Address.Text,
-            PostCode = Txt_PostCode.Text,
-            PostArea = Txt_PostArea.Text,
-            BirthNumber = Txt_OrgNoBirthNumber.Text,
-            ContactPerson = Txt_ContactPerson.Text,
-            Phone = Txt_Phone.Text,
-            Email = Txt_Email.Text,
-            Description = Txt_Description.Text,
-            FinancePlan = Txt_FinancePlan.Text,
-            BusinessDescription = Txt_BusinessDescription.Text,
-            ApplicationAmount = Txt_ApplicationAmount.Text,
-            Bcc = GetEmailForMunicipality(Ddl_Municipality.SelectedValue)
-        };
+        private EmailData GetEmailData() => new EmailData(
+            emailAddressValidationUtility: _emailAddressValidationUtility,
+            emailHeader: _propertyService.GetStringProperty(CurrentPage, "EmailHeader"),
+            emailFooter: _propertyService.GetStringProperty(CurrentPage, "EmailFooter"),
+            applicationSender: Txt_Email.Text,
+            subject: _propertyService.GetStringProperty(CurrentPage, "EmailSubject"),
+            emailReceivers: GetEmailForMunicipality(Ddl_Municipality.SelectedValue),
+            bcc: GetEmailForMunicipality(Ddl_Municipality.SelectedValue),
+            attachments: ConvertToAttachmentFiles(Request.Files),
+            county: Ddl_County.SelectedValue,
+            municipality: Ddl_Municipality.SelectedValue,
+            applicator: Txt_Applicator.Text,
+            address: Txt_Address.Text,
+            postCode: Txt_PostCode.Text,
+            postArea: Txt_PostArea.Text,
+            birthNumber: Txt_OrgNoBirthNumber.Text,
+            contactPerson: Txt_ContactPerson.Text,
+            phone: Txt_Phone.Text,
+            email: Txt_Email.Text,
+            description: Txt_Description.Text,
+            financePlan: Txt_FinancePlan.Text,
+            businessDescription: Txt_BusinessDescription.Text,
+            applicationAmount: Txt_ApplicationAmount.Text
+        );
 
-        private string GetEmailForMunicipality(string municipality) =>
-            _contactPersonUtility.GetContactPersons()
+        private List<string> GetEmailForMunicipality(string municipality)
+        {
+            List<string> emails = new List<string>();
+            string email = _contactPersonUtility.GetContactPersons()
                 .FirstOrDefault(c => c.Municipality.Equals(municipality, StringComparison.InvariantCultureIgnoreCase))?.Email;
-        
+            if (email != null)
+            {
+                emails.Add(email);
+            }
+
+            return emails;
+        }
+
         private static List<AttachmentFile> ConvertToAttachmentFiles(HttpFileCollection requestFiles)
         {
             List<AttachmentFile> attachments = new List<AttachmentFile>();
