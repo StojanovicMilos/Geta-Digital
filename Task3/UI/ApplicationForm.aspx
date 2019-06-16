@@ -1,5 +1,5 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Templates/MasterPages/MasterPage.Master" MaintainScrollPositionOnPostback="true" AutoEventWireup="false" CodeBehind="ApplicationForm.aspx.cs" Inherits="Legacy.Web.Templates.Pages.ApplicationForm" %>
-<%@ Import Namespace="Legacy.Core.Services" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Templates/MasterPages/MasterPage.Master" MaintainScrollPositionOnPostback="true" AutoEventWireup="false" CodeBehind="ApplicationForm.aspx.cs" Inherits="Task3.UI.ApplicationForm" %>
+<%@ Import Namespace="Task3.UI" %>
 
 <%@ Register TagPrefix="Legacy" TagName="PrinterfriendlyLink"  Src="~/Templates/PageContentUnits/PrinterfriendlyLink.ascx"  %>
 <%@ Register TagPrefix="Legacy" TagName="MainBody" Src="~/Templates/PageContentUnits/MainBody.ascx" %>

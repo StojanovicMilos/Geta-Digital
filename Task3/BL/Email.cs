@@ -5,14 +5,16 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using Legacy.Web.Templates.Pages;
+using Task3.BL;
+using Task3.DAL;
 
 namespace Task3
 {
-    public class Email
+    public class Email : IEmail
     {
-        private readonly DAL _dal;
+        private readonly DAO _dal;
 
-        public Email(DAL dal)
+        public Email(DAO dal)
         {
             _dal = dal ?? throw new ArgumentNullException(nameof(dal));
         }
@@ -90,10 +92,10 @@ namespace Task3
         /// <param name="mail">The mail.</param>
         /// <param name="isBodyHtml">if set to <c>true</c> [is body HTML].</param>
         /// <returns></returns>
-        public bool SendMail(string subject, ContactPerson details, List<AttachmentFile> attachments, string applicationReciever, string applicationSender)
+        public bool SendMail(string subject, ContactPerson details, List<AttachmentFile> attachments, string applicationReceiver, string applicationSender, string emailHeader)
         {
-            var content = BuildEmailContent(details);
-            MailMessage mailMessage = BuildMail(applicationSender, subject, content, applicationReciever, applicationReciever, GetAttachments(attachments));
+            var content = BuildEmailContent(details, emailHeader);
+            MailMessage mailMessage = BuildMail(applicationSender, subject, content, applicationReceiver, applicationReceiver, GetAttachments(attachments));
             return SendMail(mailMessage, true);
         }
 
@@ -161,7 +163,7 @@ namespace Task3
         /// Builds the content of the email body
         /// </summary>
         /// <returns></returns>
-        protected string BuildEmailContent(ContactPerson details)
+        protected string BuildEmailContent(ContactPerson details, string emailHeader)
         {
             //TODO use details instead of UI controls
             const string SummaryStart = "<table>";
@@ -178,25 +180,25 @@ namespace Task3
             const string ValueElementFullWidthEnd = "</td></tr>";
 
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(ContentStart);
-            stringBuilder.AppendLine(PropertyService.GetStringProperty(CurrentPage, "EmailHeader"));
-            stringBuilder.AppendLine(SummaryStart);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/county") + LabelElementEnd + ValueElementStart + Ddl_County.SelectedValue + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/municipality") + LabelElementEnd + ValueElementStart + Ddl_Municipality.SelectedItem + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/applicator") + LabelElementEnd + ValueElementStart + Txt_Applicator.Text + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/address") + LabelElementEnd + ValueElementStart + Txt_Address.Text + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/postcode") + " / " + GetLanguageString("/applicationform/postarea") + LabelElementEnd + ValueElementStart + Txt_PostCode.Text + " " + Txt_PostArea.Text + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/orgnobirthnumber") + LabelElementEnd + ValueElementStart + Txt_OrgNoBirthNumber.Text + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/contactperson") + LabelElementEnd + ValueElementStart + Txt_ContactPerson.Text + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/phone") + LabelElementEnd + ValueElementStart + Txt_Phone.Text + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/email") + LabelElementEnd + ValueElementStart + Txt_Email.Text + ValueElementEnd);
-            stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/description") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_Description.Text + ValueElementFullWidthEnd);
-            stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/financeplan") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_FinancePlan.Text + ValueElementFullWidthEnd);
-            stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/businessdescription") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_BusinessDescription.Text + ValueElementFullWidthEnd);
-            stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/applicationAmount") + LabelElementEnd + ValueElementStart + Txt_ApplicationAmount.Text + ValueElementEnd);
-            stringBuilder.AppendLine(SummaryEnd);
-            stringBuilder.AppendLine(PropertyService.GetStringProperty(CurrentPage, "EmailFooter"));
-            stringBuilder.AppendLine(ContentEnd);
+            //stringBuilder.AppendLine(ContentStart);
+            //stringBuilder.AppendLine(emailHeader);
+            //stringBuilder.AppendLine(SummaryStart);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/county") + LabelElementEnd + ValueElementStart + Ddl_County.SelectedValue + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/municipality") + LabelElementEnd + ValueElementStart + Ddl_Municipality.SelectedItem + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/applicator") + LabelElementEnd + ValueElementStart + Txt_Applicator.Text + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/address") + LabelElementEnd + ValueElementStart + Txt_Address.Text + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/postcode") + " / " + GetLanguageString("/applicationform/postarea") + LabelElementEnd + ValueElementStart + Txt_PostCode.Text + " " + Txt_PostArea.Text + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/orgnobirthnumber") + LabelElementEnd + ValueElementStart + Txt_OrgNoBirthNumber.Text + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/contactperson") + LabelElementEnd + ValueElementStart + Txt_ContactPerson.Text + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/phone") + LabelElementEnd + ValueElementStart + Txt_Phone.Text + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/email") + LabelElementEnd + ValueElementStart + Txt_Email.Text + ValueElementEnd);
+            //stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/description") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_Description.Text + ValueElementFullWidthEnd);
+            //stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/financeplan") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_FinancePlan.Text + ValueElementFullWidthEnd);
+            //stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/businessdescription") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_BusinessDescription.Text + ValueElementFullWidthEnd);
+            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/applicationAmount") + LabelElementEnd + ValueElementStart + Txt_ApplicationAmount.Text + ValueElementEnd);
+            //stringBuilder.AppendLine(SummaryEnd);
+            //stringBuilder.AppendLine(PropertyService.GetStringProperty(CurrentPage, "EmailFooter"));
+            //stringBuilder.AppendLine(ContentEnd);
 
             return stringBuilder.ToString();
         }
@@ -209,6 +211,12 @@ namespace Task3
         public string GetEmailForMunicipality(string municipality)
             => _dal.PopulateContactPersonList()
                 .FirstOrDefault(c => c.Municipality.Equals(municipality, StringComparison.InvariantCultureIgnoreCase))?.Email;
+    }
+
+    public interface IEmail
+    {
+        string GetEmailForMunicipality(string selectedValue);
+        bool SendMail(string subject, ContactPerson details, List<AttachmentFile> attachments, string applicationReceiver, string applicationSender, string emailHeader);
     }
 
     public class AttachmentFile

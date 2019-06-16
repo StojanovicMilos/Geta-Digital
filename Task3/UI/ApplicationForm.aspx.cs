@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using Task3;
+using System.Web;
+using Legacy.Web.Templates.Pages;
+using Task3.DAL;
+using ListItem = Task3.DAL.ListItem;
 
-namespace Legacy.Web.Templates.Pages
+namespace Task3.UI
 {
     public partial class ApplicationForm : TemplatePageBase<ApplicationFormPage>
     {
-        private readonly DAL _dal;
-        private readonly Language _language;
-        private readonly Email _email;
+        private readonly IDAO _dao;
+        private readonly ILanguage _language;
+        private readonly IEmail _email;
 
-        protected List<ContactPerson> contactPersonList;
-        protected string[] countyList = { "", "Nordland", "Nord Trøndelag", "Sør Trøndelag", "Møre og Romsdal", "Sogn og Fjordane", "Hordaland", "Rogaland", "Vest Agder" };
-        
-
-        public ApplicationForm(DAL dal, Language language, Email email) : base()
+        public ApplicationForm(IDAO dao, Language language, IEmail email) : base()
         {
-            _dal = dal ?? throw new ArgumentNullException(nameof(dal));
+            _dao = dao ?? throw new ArgumentNullException(nameof(dao));
             _language = language ?? throw new ArgumentNullException(nameof(language));
             _email = email ?? throw new ArgumentNullException(nameof(email));
         }
@@ -24,24 +23,30 @@ namespace Legacy.Web.Templates.Pages
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+            if (IsPostBack)
+                return;
 
-            if (!IsPostBack)
-            {
-                DataBind();
-                PopulateCountyList();
-            }
+            DataBind();
+            PopulateCountyList();
         }
-        protected bool SendFormContentByEmail()
+
+        private bool SendFormContentByEmail()
         {
             string subject = PropertyService.GetStringProperty(CurrentPage, "EmailSubject");
 
-            string applicationReciever = _email.GetEmailForMunicipality(Ddl_Municipality.SelectedValue);
+            string applicationReceiver = _email.GetEmailForMunicipality(Ddl_Municipality.SelectedValue);
             string applicationSender = Txt_Email.Text;
-            var attachments = Request.Files;
+            List<AttachmentFile> attachments = ConvertToAttachmentFiles(Request.Files);
 
             ContactPerson details = GetDetailsFromUI();
+            string emailHeader = PropertyService.GetStringProperty(CurrentPage, "EmailHeader");
 
-            _email.SendMail(subject, details, attachments, applicationReciever, applicationSender);
+            return _email.SendMail(subject, details, attachments, applicationReceiver, applicationSender, emailHeader);
+        }
+
+        private List<AttachmentFile> ConvertToAttachmentFiles(HttpFileCollection requestFiles)
+        {
+            throw new NotImplementedException();
         }
 
         private ContactPerson GetDetailsFromUI()
@@ -56,7 +61,7 @@ namespace Legacy.Web.Templates.Pages
         /// </summary>
         protected void PopulateCountyList()
         {
-            Ddl_County.DataSource = countyList;
+            Ddl_County.DataSource = _dao.GetCountryList();
             Ddl_County.DataBind();
         }
 
@@ -67,8 +72,13 @@ namespace Legacy.Web.Templates.Pages
         protected void PopulateMunicipalityList(string county)
         {
             Ddl_Municipality.Items.Clear();
-            Ddl_Municipality.Items.Add(new ListItem("", ""));
-            Ddl_Municipality.Items = _dal.PopulateMunicipalityList(county);
+            Ddl_Municipality.Items.Add("");
+            Ddl_Municipality.Items.AddRange(ConvertToListItemCollection(_dao.PopulateMunicipalityList(county)));
+        }
+
+        private System.Web.UI.WebControls.ListItem[] ConvertToListItemCollection(List<ListItem> populateMunicipalityList)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -79,7 +89,7 @@ namespace Legacy.Web.Templates.Pages
             if (pnlFileUpload.Visible)
             {
                 //Create dummy datasource to display the correct number of FileUpload controls.
-                if (!CurrentPage.Property["NumberOfFileUploads"].IsNull)
+                if (CurrentPage.Property["NumberOfFileUploads"] != null)
                 {
                     int numberOfFiles = (int)CurrentPage.Property["NumberOfFileUploads"].Value;
 

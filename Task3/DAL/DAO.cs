@@ -2,19 +2,17 @@
 using System.Linq;
 using Legacy.Web.Templates.Pages;
 
-namespace Task3
+namespace Task3.DAL
 {
-    public class DAL
+    public class DAO : IDAO
     {
         public List<ListItem> PopulateMunicipalityList(string country)
         {
-            List<ListItem> result = new List<ListItem>();
-            foreach (ContactPerson contactPerson in PopulateContactPersonList().Where(c => c.County.Equals(country)))
-            {
-                result.Add(contactPerson.Municipality == "mrHeroy" ? new ListItem("Herøy", contactPerson.Municipality) : new ListItem(contactPerson.Municipality));
-            }
-
-            return result;
+            return PopulateContactPersonList()
+                .Where(c => c.County.Equals(country))
+                .Select(contactPerson => contactPerson.Municipality == "mrHeroy" ? 
+                    new ListItem("Herøy", contactPerson.Municipality) : 
+                    new ListItem(contactPerson.Municipality)).ToList();
         }
 
         public List<ContactPerson> PopulateContactPersonList()
@@ -81,5 +79,7 @@ namespace Task3
             };
             return contactPersonList;
         }
+
+        public string[] GetCountryList() => new[] {"", "Nordland", "Nord Trøndelag", "Sør Trøndelag", "Møre og Romsdal", "Sogn og Fjordane", "Hordaland", "Rogaland", "Vest Agder"};
     }
 }

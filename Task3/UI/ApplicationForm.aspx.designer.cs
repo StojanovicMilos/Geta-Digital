@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Legacy.Web.Templates.Pages {
+namespace Task3.UI {
     
     
     public partial class ApplicationForm {
@@ -19,7 +19,7 @@ namespace Legacy.Web.Templates.Pages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Legacy.Web.Templates.PageContentUnits.PageName PageName1;
+        protected global::System.Web.UI.UserControl PageName1;
         
         /// <summary>
         /// Backlink1 control.
@@ -28,7 +28,7 @@ namespace Legacy.Web.Templates.Pages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Legacy.Web.Templates.PageContentUnits.Backlink Backlink1;
+        protected global::System.Web.UI.UserControl Backlink1;
         
         /// <summary>
         /// MainIntro1 control.
@@ -37,7 +37,7 @@ namespace Legacy.Web.Templates.Pages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Legacy.Web.Templates.PageContentUnits.MainIntro MainIntro1;
+        protected global::System.Web.UI.UserControl MainIntro1;
         
         /// <summary>
         /// MainBody1 control.
@@ -46,7 +46,7 @@ namespace Legacy.Web.Templates.Pages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Legacy.Web.Templates.PageContentUnits.MainBody MainBody1;
+        protected global::System.Web.UI.UserControl MainBody1;
         
         /// <summary>
         /// Ddl_County control.
@@ -217,7 +217,7 @@ namespace Legacy.Web.Templates.Pages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Legacy.Web.Templates.PageContentUnits.PageInfo PageInfo1;
+        protected global::System.Web.UI.UserControl PageInfo1;
         
         /// <summary>
         /// PrinterfriendlyLink1 control.
@@ -226,7 +226,7 @@ namespace Legacy.Web.Templates.Pages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Legacy.Web.Templates.PageContentUnits.PrinterfriendlyLink PrinterfriendlyLink1;
+        protected global::System.Web.UI.UserControl PrinterfriendlyLink1;
         
         /// <summary>
         /// BottomImage1 control.
@@ -235,6 +235,6 @@ namespace Legacy.Web.Templates.Pages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Legacy.Web.Templates.PageContentUnits.BottomImage BottomImage1;
+        protected global::System.Web.UI.UserControl BottomImage1;
     }
 }

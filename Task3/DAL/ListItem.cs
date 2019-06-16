@@ -1,7 +1,8 @@
-﻿namespace Task3
+﻿namespace Task3.DAL
 {
-    internal class ListItem
+    public class ListItem
     {
+        private readonly string _detail;
         private string municipality;
 
         public ListItem(string municipality)
@@ -9,8 +10,9 @@
             this.municipality = municipality;
         }
 
-        public ListItem(string municipality, string municipality1)
+        public ListItem(string detail, string municipality)
         {
+            _detail = detail;
             this.municipality = municipality;
         }
     }

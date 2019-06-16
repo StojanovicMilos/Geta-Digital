@@ -1,6 +1,6 @@
 ﻿namespace Task3
 {
-    public class Language
+    public class Language : ILanguage
     {
         public string GetLanguageString(string xmlPath)
         {
