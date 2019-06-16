@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls;
 using Task3.BL;
-using Task3.DAL;
 
 namespace Task3.UI
 {
@@ -16,7 +15,7 @@ namespace Task3.UI
         private readonly IPropertyService _propertyService;
 
         // ReSharper disable once RedundantBaseConstructorCall
-        public ApplicationForm(IDAO dao, Language language, IEmail email, IPropertyService propertyService) : base()
+        public ApplicationForm(IDAO dao, ILanguage language, IEmail email, IPropertyService propertyService) : base()
         {
             _dao = dao ?? throw new ArgumentNullException(nameof(dao));
             _language = language ?? throw new ArgumentNullException(nameof(language));

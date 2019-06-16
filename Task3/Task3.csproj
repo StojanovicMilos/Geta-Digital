@@ -50,7 +50,7 @@
     <Compile Include="BL\ILanguage.cs" />
     <Compile Include="BL\IStringValidationUtility.cs" />
     <Compile Include="BL\StringValidationUtility.cs" />
-    <Compile Include="DAL\IDAO.cs" />
+    <Compile Include="BL\IDAO.cs" />
     <Compile Include="UI\ApplicationForm.aspx.cs">
       <DependentUpon>ApplicationForm.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

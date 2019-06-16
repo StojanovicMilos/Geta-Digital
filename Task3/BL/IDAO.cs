@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-using Task3.BL;
 
-namespace Task3.DAL
+namespace Task3.BL
 {
     public interface IDAO
     {

@@ -1,6 +1,6 @@
 ﻿namespace Task3.BL
 {
-    internal class StringValidationUtility : IStringValidationUtility
+    public class StringValidationUtility : IStringValidationUtility
     {
         public bool IsValidEmailAddress(string address)
         {
