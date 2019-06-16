@@ -42,15 +42,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BL\AttachmentFile.cs" />
-    <Compile Include="BL\DropdownListItem.cs" />
-    <Compile Include="BL\EmailData.cs" />
-    <Compile Include="BL\EPiServer.cs" />
-    <Compile Include="BL\IEmail.cs" />
-    <Compile Include="BL\ILanguage.cs" />
-    <Compile Include="BL\IStringValidationUtility.cs" />
-    <Compile Include="BL\StringValidationUtility.cs" />
-    <Compile Include="BL\IDAO.cs" />
+    <Compile Include="BLL\BO\AttachmentFile.cs" />
+    <Compile Include="BLL\BO\EmailData.cs" />
+    <Compile Include="BLL\BL\EPiServer.cs" />
+    <Compile Include="BLL\Interfaces\ContactPersonUtility.cs" />
+    <Compile Include="BLL\Interfaces\IContactPersonUtility.cs" />
+    <Compile Include="BLL\Interfaces\ICountryUtility.cs" />
+    <Compile Include="BLL\Interfaces\IContactPersonDAO.cs" />
+    <Compile Include="BLL\Interfaces\IEmail.cs" />
+    <Compile Include="BLL\Interfaces\ILanguage.cs" />
+    <Compile Include="BLL\Interfaces\IStringValidationUtility.cs" />
+    <Compile Include="BLL\BL\StringValidationUtility.cs" />
+    <Compile Include="BLL\Interfaces\ICountryListDAO.cs" />
+    <Compile Include="DAL\ContactPersonDAO.cs" />
     <Compile Include="UI\ApplicationForm.aspx.cs">
       <DependentUpon>ApplicationForm.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -59,10 +63,10 @@
       <DependentUpon>ApplicationForm.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\ApplicationFormPage.cs" />
-    <Compile Include="BL\ContactPerson.cs" />
-    <Compile Include="DAL\DAO.cs" />
-    <Compile Include="BL\Email.cs" />
-    <Compile Include="BL\Language.cs" />
+    <Compile Include="BLL\BO\ContactPerson.cs" />
+    <Compile Include="DAL\CountryListDAO.cs" />
+    <Compile Include="BLL\BL\Email.cs" />
+    <Compile Include="BLL\BL\Language.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\CurrentPage.cs" />
     <Compile Include="UI\IPropertyService.cs" />

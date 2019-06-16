@@ -1,4 +1,6 @@
-﻿namespace Task3.BL
+﻿using Task3.BLL.BO;
+
+namespace Task3.BLL.Interfaces
 {
     public interface IEmail
     {

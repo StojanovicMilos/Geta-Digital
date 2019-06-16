@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Task3.BL
+namespace Task3.BLL.BO
 {
     public class AttachmentFile
     {

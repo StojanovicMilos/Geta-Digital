@@ -1,4 +1,4 @@
-﻿namespace Task3.BL
+﻿namespace Task3.BLL.BL
 {
     public class EPiServer
     {

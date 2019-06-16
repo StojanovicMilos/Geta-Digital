@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using Task3.BLL.BO;
+using Task3.BLL.Interfaces;
 
-namespace Task3.BL
+namespace Task3.BLL.BL
 {
     public class Email : IEmail
     {

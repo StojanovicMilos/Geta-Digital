@@ -1,4 +1,6 @@
-﻿namespace Task3.BL
+﻿using Task3.BLL.Interfaces;
+
+namespace Task3.BLL.BL
 {
     public class Language : ILanguage
     {

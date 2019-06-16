@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls;
-using Task3.BL;
+using Task3.BLL.BO;
+using Task3.BLL.Interfaces;
 
 namespace Task3.UI
 {
     public partial class ApplicationForm : TemplatePageBase<ApplicationFormPage>
     {
-        private readonly IDAO _dao;
         private readonly ILanguage _language;
         private readonly IEmail _email;
         private readonly IPropertyService _propertyService;
+        private readonly IContactPersonUtility _contactPersonUtility;
+        private readonly ICountryUtility _countryUtility;
 
         // ReSharper disable once RedundantBaseConstructorCall
-        public ApplicationForm(IDAO dao, ILanguage language, IEmail email, IPropertyService propertyService) : base()
+        public ApplicationForm(ILanguage language, IEmail email, IPropertyService propertyService, IContactPersonUtility contactPersonUtility, ICountryUtility countryUtility) : base()
         {
-            _dao = dao ?? throw new ArgumentNullException(nameof(dao));
             _language = language ?? throw new ArgumentNullException(nameof(language));
             _email = email ?? throw new ArgumentNullException(nameof(email));
             _propertyService = propertyService ?? throw new ArgumentNullException(nameof(propertyService));
+            _contactPersonUtility = contactPersonUtility ?? throw new ArgumentNullException(nameof(contactPersonUtility));
+            _countryUtility = countryUtility ?? throw new ArgumentNullException(nameof(countryUtility));
         }
 
         protected override void OnLoad(EventArgs e)
@@ -35,10 +38,10 @@ namespace Task3.UI
 
         protected void PopulateCountyList()
         {
-            Ddl_County.DataSource = _dao.GetCountryList();
+            Ddl_County.DataSource = _countryUtility.GetCountryList();
             Ddl_County.DataBind();
         }
-        
+
         protected void btnShowFileUpload_Click(object sender, EventArgs e)
         {
             pnlFileUpload.Visible = true;
@@ -78,7 +81,7 @@ namespace Task3.UI
         private EmailData GetEmailDataFromUI() => new EmailData
         {
             Subject = _propertyService.GetStringProperty(CurrentPage, "EmailSubject"),
-            ApplicationReceiver = _dao.GetEmailForMunicipality(Ddl_Municipality.SelectedValue),
+            ApplicationReceiver = GetEmailForMunicipality(Ddl_Municipality.SelectedValue),
             ApplicationSender = Txt_Email.Text,
             Attachments = ConvertToAttachmentFiles(Request.Files),
             County = Ddl_County.SelectedValue,
@@ -97,9 +100,13 @@ namespace Task3.UI
             FinancePlan = Txt_FinancePlan.Text,
             BusinessDescription = Txt_BusinessDescription.Text,
             ApplicationAmount = Txt_ApplicationAmount.Text,
-            Bcc = _dao.GetEmailForMunicipality(Ddl_Municipality.SelectedValue)
+            Bcc = GetEmailForMunicipality(Ddl_Municipality.SelectedValue)
         };
 
+        private string GetEmailForMunicipality(string municipality) =>
+            _contactPersonUtility.GetContactPersons()
+                .FirstOrDefault(c => c.Municipality.Equals(municipality, StringComparison.InvariantCultureIgnoreCase))?.Email;
+        
         private static List<AttachmentFile> ConvertToAttachmentFiles(HttpFileCollection requestFiles)
         {
             List<AttachmentFile> attachments = new List<AttachmentFile>();
@@ -127,12 +134,15 @@ namespace Task3.UI
             else
             {
                 Ddl_Municipality.Items.Add(new ListItem {Text = string.Empty, Value = string.Empty});
-                var municipalities = _dao.GetMunicipalities(Ddl_County.SelectedValue);
-                Ddl_Municipality.Items.AddRange(ConvertToListItemCollection(municipalities));
+                Ddl_Municipality.Items.AddRange(GetMunicipalities(Ddl_County.SelectedValue));
             }
         }
 
-        private ListItem[] ConvertToListItemCollection(IQueryable<DropdownListItem> municipalityList) => municipalityList.Select(m => new ListItem(m.Text, m.Value)).ToArray();
+        private ListItem[] GetMunicipalities(string country) =>
+            _contactPersonUtility.GetContactPersons()
+                .Where(c => c.County.Equals(country))
+                .Select(contactPerson => contactPerson.Municipality == "mrHeroy" ? new ListItem("Herøy", contactPerson.Municipality) : new ListItem(contactPerson.Municipality))
+                .ToArray();
 
         protected string GetLanguageString(string xmlPath) => _language.GetLanguageString(xmlPath);
 
