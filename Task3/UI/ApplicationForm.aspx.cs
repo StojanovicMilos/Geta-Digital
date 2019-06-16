@@ -38,7 +38,7 @@ namespace Task3.UI
 
         protected void PopulateCountyList()
         {
-            Ddl_County.DataSource = _countryUtility.GetCountryList();
+            Ddl_County.DataSource = _countryUtility.GetCountries();
             Ddl_County.DataBind();
         }
 

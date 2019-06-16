@@ -46,6 +46,7 @@
     <Compile Include="BLL\BO\EmailData.cs" />
     <Compile Include="BLL\BL\EPiServer.cs" />
     <Compile Include="BLL\Interfaces\ContactPersonUtility.cs" />
+    <Compile Include="BLL\Interfaces\CountryUtility.cs" />
     <Compile Include="BLL\Interfaces\IContactPersonUtility.cs" />
     <Compile Include="BLL\Interfaces\ICountryUtility.cs" />
     <Compile Include="BLL\Interfaces\IContactPersonDAO.cs" />
@@ -64,7 +65,7 @@
     </Compile>
     <Compile Include="UI\ApplicationFormPage.cs" />
     <Compile Include="BLL\BO\ContactPerson.cs" />
-    <Compile Include="DAL\CountryListDAO.cs" />
+    <Compile Include="DAL\CountryDAO.cs" />
     <Compile Include="BLL\BL\Email.cs" />
     <Compile Include="BLL\BL\Language.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

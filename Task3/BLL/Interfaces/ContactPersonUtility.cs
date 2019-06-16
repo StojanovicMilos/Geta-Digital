@@ -6,13 +6,13 @@ namespace Task3.BLL.Interfaces
 {
     public class ContactPersonUtility : IContactPersonUtility
     {
-        private readonly IContactPersonDAO _dao;
+        private readonly IContactPersonDAO _contactPersonDAO;
 
-        public ContactPersonUtility(IContactPersonDAO dao)
+        public ContactPersonUtility(IContactPersonDAO countaPersonDAO)
         {
-            _dao = dao ?? throw new ArgumentNullException(nameof(dao));
+            _contactPersonDAO = countaPersonDAO ?? throw new ArgumentNullException(nameof(countaPersonDAO));
         }
 
-        public IQueryable<ContactPerson> GetContactPersons() => _dao.GetContactPersons();
+        public IQueryable<ContactPerson> GetContactPersons() => _contactPersonDAO.GetContactPersons();
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Task3.BLL.Interfaces
 {
-    public interface ICountryListDAO
+    public interface ICountryDAO
     {
-        IQueryable<string> GetCountryList();
+        IQueryable<string> GetCountries();
     }
 }
