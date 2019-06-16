@@ -4,35 +4,75 @@ using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
-using Legacy.Web.Templates.Pages;
-using Task3.DAL;
 
 namespace Task3.BL
 {
     public class Email : IEmail
     {
-        private readonly DAO _dal;
+        private readonly ILanguage _language;
+        private readonly IStringValidationUtility _stringValidationUtility;
 
-        public Email(DAO dal)
+        public Email(ILanguage language, IStringValidationUtility stringValidationUtility)
         {
-            _dal = dal ?? throw new ArgumentNullException(nameof(dal));
+            _language = language ?? throw new ArgumentNullException(nameof(language));
+            _stringValidationUtility = stringValidationUtility ?? throw new ArgumentNullException(nameof(stringValidationUtility));
         }
 
+        public bool SendMail(EmailData data)
+        { 
+            var content = BuildEmailContent(data);
+            MailMessage mailMessage = BuildMail(content, data);
+            return SendMail(mailMessage, isBodyHtml: true);
+        }
 
-        /// <summary>
-        /// Builds the mail.
-        /// </summary>
-        /// <param name="toAddresses">To addresses.</param>
-        /// <param name="subject">The subject.</param>
-        /// <param name="content">The content.</param>
-        /// <param name="fromAdress">From adress.</param>
-        /// <param name="bccAddress">Bcc adress.</param>
-        /// <param name="attachmentCol">The attachment col.</param>
-        /// <returns></returns>
-        public MailMessage BuildMail(string toAddresses, string subject, string content, string fromAdress, string bccAddress, Attachment[] attachmentCol)
+        private string BuildEmailContent(EmailData emailData)
         {
+            StringBuilder stringBuilder = new StringBuilder();
+            const string contentStart = "<html>";
+            stringBuilder.AppendLine(contentStart);
+            stringBuilder.AppendLine(emailData.EmailHeader);
+            const string summaryStart = "<table>";
+            stringBuilder.AppendLine(summaryStart);
+            const string labelElementStart = "<tr><td><strong>";
+            const string labelElementEnd = "</strong></td>";
+            const string valueElementStart = "<td>";
+            const string valueElementEnd = "</td></tr>";
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/county") + labelElementEnd + valueElementStart + emailData.County + valueElementEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/municipality") + labelElementEnd + valueElementStart + emailData.Municipality + valueElementEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/applicator") + labelElementEnd + valueElementStart + emailData.Applicator + valueElementEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/address") + labelElementEnd + valueElementStart + emailData.Address + valueElementEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/postcode") + " / " + _language.GetLanguageString("/applicationform/postarea") + labelElementEnd + valueElementStart + emailData.PostCode + " " + emailData.PostArea + valueElementEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/orgnobirthnumber") + labelElementEnd + valueElementStart + emailData.BirthNumber + valueElementEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/contactperson") + labelElementEnd + valueElementStart + emailData.ContactPerson + valueElementEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/phone") + labelElementEnd + valueElementStart + emailData.Phone + valueElementEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/email") + labelElementEnd + valueElementStart + emailData.Email + valueElementEnd);
+            const string labelElementFullWidthStart = "<tr><td colspan=\"2\"><strong>";
+            const string labelElementFullWidthEnd = "</strong></td></tr>";
+            const string valueElementFullWidthStart = "<tr><td colspan=\"2\">";
+            const string valueElementFullWidthEnd = "</td></tr>";
+            stringBuilder.AppendLine(labelElementFullWidthStart + _language.GetLanguageString("/applicationform/description") + labelElementFullWidthEnd + valueElementFullWidthStart + emailData.Description + valueElementFullWidthEnd);
+            stringBuilder.AppendLine(labelElementFullWidthStart + _language.GetLanguageString("/applicationform/financeplan") + labelElementFullWidthEnd + valueElementFullWidthStart + emailData.FinancePlan + valueElementFullWidthEnd);
+            stringBuilder.AppendLine(labelElementFullWidthStart + _language.GetLanguageString("/applicationform/businessdescription") + labelElementFullWidthEnd + valueElementFullWidthStart + emailData.BusinessDescription + valueElementFullWidthEnd);
+            stringBuilder.AppendLine(labelElementStart + _language.GetLanguageString("/applicationform/applicationAmount") + labelElementEnd + valueElementStart + emailData.ApplicationAmount + valueElementEnd);
+            const string summaryEnd = "</table>";
+            stringBuilder.AppendLine(summaryEnd);
+            stringBuilder.AppendLine(emailData.EmailFooter);
+            const string contentEnd = "</html>";
+            stringBuilder.AppendLine(contentEnd);
+
+            return stringBuilder.ToString();
+        }
+
+        private MailMessage BuildMail(string content, EmailData data)
+        {
+            string toAddresses = data.ApplicationReceiver;
+            string subject = data.Subject;
+            string fromAdress = data.ApplicationSender;
+            string bccAddress = data.Bcc;
+            Attachment[] attachmentCol = GetAttachments(data.Attachments);
+
             //Receipents
-            MailAddressCollection receipents = new MailAddressCollection();
+            MailAddressCollection recipients = new MailAddressCollection();
 
             if (toAddresses.Contains(";"))
             {
@@ -42,13 +82,13 @@ namespace Task3.BL
                 {
                     if (!s.StartsWith(";"))
                     {
-                        receipents.Add(s);
+                        recipients.Add(s);
                     }
                 }
             }
             else
             {
-                receipents.Add(toAddresses);
+                recipients.Add(toAddresses);
             }
 
             //From
@@ -56,7 +96,7 @@ namespace Task3.BL
             MailMessage mail = new MailMessage();
 
             //To
-            foreach (MailAddress attendee in receipents)
+            foreach (MailAddress attendee in recipients)
             {
                 mail.To.Add(attendee);
             }
@@ -85,18 +125,12 @@ namespace Task3.BL
             return mail;
         }
 
-        /// <summary>
-        /// Sends an email with calendar event.
-        /// </summary>
-        /// <param name="mail">The mail.</param>
-        /// <param name="isBodyHtml">if set to <c>true</c> [is body HTML].</param>
-        /// <returns></returns>
-        public bool SendMail(string subject, ContactPerson details, List<AttachmentFile> attachments, string applicationReceiver, string applicationSender, string emailHeader)
-        {
-            var content = BuildEmailContent(details, emailHeader);
-            MailMessage mailMessage = BuildMail(applicationSender, subject, content, applicationReceiver, applicationReceiver, GetAttachments(attachments));
-            return SendMail(mailMessage, true);
-        }
+        public Attachment[] GetAttachments(List<AttachmentFile> files) =>
+            (from file in files.Where(f => f != null && f.ContentLength > 0)
+                let fileName = Path.GetFileName(file.FileName)
+                where fileName != string.Empty
+                select new Attachment(file.InputStream, fileName, file.ContentType)
+            ).ToArray();
 
         private bool SendMail(MailMessage mail, bool isBodyHtml)
         {
@@ -111,7 +145,7 @@ namespace Task3.BL
                     bool ok = true;
                     foreach (MailAddress singleToAddress in mail.To)
                     {
-                        if (!StringValidationUtil.IsValidEmailAddress(singleToAddress.Address))
+                        if (!_stringValidationUtility.IsValidEmailAddress(singleToAddress.Address))
                         {
                             ok = false;
                         }
@@ -128,7 +162,7 @@ namespace Task3.BL
                     return retStatus;
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -136,85 +170,5 @@ namespace Task3.BL
 
             return false;
         }
-
-        /// <summary>
-        /// Returns a list of selected Attachments
-        /// </summary>
-        /// <returns></returns>
-        public Attachment[] GetAttachments(List<AttachmentFile> files)
-        {
-            List<Attachment> attachmentList = new List<Attachment>();
-
-            foreach (AttachmentFile postedFile in files.Where(f => f != null && f.ContentLength > 0))
-            {
-                string fileName = Path.GetFileName(postedFile.FileName);
-                if (fileName != string.Empty)
-                {
-                    Attachment newAttachment = new Attachment(postedFile.InputStream, fileName, postedFile.ContentType);
-                    attachmentList.Add(newAttachment);
-                }
-            }
-
-            return attachmentList.ToArray();
-        }
-
-        /// <summary>
-        /// Builds the content of the email body
-        /// </summary>
-        /// <returns></returns>
-        protected string BuildEmailContent(ContactPerson details, string emailHeader)
-        {
-            //TODO use details instead of UI controls
-            const string SummaryStart = "<table>";
-            const string SummaryEnd = "</table>";
-            const string ContentStart = "<html>";
-            const string ContentEnd = "</html>";
-            const string LabelElementStart = "<tr><td><strong>";
-            const string LabelElementEnd = "</strong></td>";
-            const string ValueElementStart = "<td>";
-            const string ValueElementEnd = "</td></tr>";
-            const string LabelElementFullWidthStart = "<tr><td colspan=\"2\"><strong>";
-            const string LabelElementFullWidthEnd = "</strong></td></tr>";
-            const string ValueElementFullWidthStart = "<tr><td colspan=\"2\">";
-            const string ValueElementFullWidthEnd = "</td></tr>";
-
-            StringBuilder stringBuilder = new StringBuilder();
-            //stringBuilder.AppendLine(ContentStart);
-            //stringBuilder.AppendLine(emailHeader);
-            //stringBuilder.AppendLine(SummaryStart);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/county") + LabelElementEnd + ValueElementStart + Ddl_County.SelectedValue + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/municipality") + LabelElementEnd + ValueElementStart + Ddl_Municipality.SelectedItem + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/applicator") + LabelElementEnd + ValueElementStart + Txt_Applicator.Text + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/address") + LabelElementEnd + ValueElementStart + Txt_Address.Text + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/postcode") + " / " + GetLanguageString("/applicationform/postarea") + LabelElementEnd + ValueElementStart + Txt_PostCode.Text + " " + Txt_PostArea.Text + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/orgnobirthnumber") + LabelElementEnd + ValueElementStart + Txt_OrgNoBirthNumber.Text + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/contactperson") + LabelElementEnd + ValueElementStart + Txt_ContactPerson.Text + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/phone") + LabelElementEnd + ValueElementStart + Txt_Phone.Text + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/email") + LabelElementEnd + ValueElementStart + Txt_Email.Text + ValueElementEnd);
-            //stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/description") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_Description.Text + ValueElementFullWidthEnd);
-            //stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/financeplan") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_FinancePlan.Text + ValueElementFullWidthEnd);
-            //stringBuilder.AppendLine(LabelElementFullWidthStart + GetLanguageString("/applicationform/businessdescription") + LabelElementFullWidthEnd + ValueElementFullWidthStart + Txt_BusinessDescription.Text + ValueElementFullWidthEnd);
-            //stringBuilder.AppendLine(LabelElementStart + GetLanguageString("/applicationform/applicationAmount") + LabelElementEnd + ValueElementStart + Txt_ApplicationAmount.Text + ValueElementEnd);
-            //stringBuilder.AppendLine(SummaryEnd);
-            //stringBuilder.AppendLine(PropertyService.GetStringProperty(CurrentPage, "EmailFooter"));
-            //stringBuilder.AppendLine(ContentEnd);
-
-            return stringBuilder.ToString();
-        }
-
-        /// <summary>
-        /// Gets the email address or the contact person for provided municipality (kommune)
-        /// </summary>
-        /// <param name="municipality"></param>
-        /// <returns></returns>
-        public string GetEmailForMunicipality(string municipality)
-            => _dal.PopulateContactPersonList()
-                .FirstOrDefault(c => c.Municipality.Equals(municipality, StringComparison.InvariantCultureIgnoreCase))?.Email;
-    }
-
-    public interface IEmail
-    {
-        string GetEmailForMunicipality(string selectedValue);
-        bool SendMail(string subject, ContactPerson details, List<AttachmentFile> attachments, string applicationReceiver, string applicationSender, string emailHeader);
     }
 }

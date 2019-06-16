@@ -1,21 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using Legacy.Web.Templates.Pages;
+using Task3.BL;
 
 namespace Task3.DAL
 {
     public class DAO : IDAO
     {
-        public List<ListItem> PopulateMunicipalityList(string country)
+        public IQueryable<DropdownListItem> GetMunicipalities(string country)
         {
             return PopulateContactPersonList()
                 .Where(c => c.County.Equals(country))
                 .Select(contactPerson => contactPerson.Municipality == "mrHeroy" ? 
-                    new ListItem("Herøy", contactPerson.Municipality) : 
-                    new ListItem(contactPerson.Municipality)).ToList();
+                    new DropdownListItem("Herøy", contactPerson.Municipality) : 
+                    new DropdownListItem(contactPerson.Municipality));
         }
 
-        public List<ContactPerson> PopulateContactPersonList()
+        public string GetEmailForMunicipality(string municipality)
+            => PopulateContactPersonList()
+                .FirstOrDefault(c => c.Municipality.Equals(municipality, StringComparison.InvariantCultureIgnoreCase))?.Email;
+
+        private IQueryable<ContactPerson> PopulateContactPersonList()
         {
             var contactPersonList = new List<ContactPerson>
             {
@@ -77,9 +82,9 @@ namespace Task3.DAL
                 new ContactPerson("Masfjorden", "Hordaland", "astrid.sande@Legacy.com"),
                 new ContactPerson("Øygarden", "Hordaland", "astrid.sande@Legacy.com")
             };
-            return contactPersonList;
+            return contactPersonList.AsQueryable();
         }
 
-        public string[] GetCountryList() => new[] {"", "Nordland", "Nord Trøndelag", "Sør Trøndelag", "Møre og Romsdal", "Sogn og Fjordane", "Hordaland", "Rogaland", "Vest Agder"};
+        public IQueryable<string> GetCountryList() => new[] {"", "Nordland", "Nord Trøndelag", "Sør Trøndelag", "Møre og Romsdal", "Sogn og Fjordane", "Hordaland", "Rogaland", "Vest Agder"}.AsQueryable();
     }
 }

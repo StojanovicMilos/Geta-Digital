@@ -1,4 +1,4 @@
-﻿namespace Legacy.Web.Templates.Pages
+﻿namespace Task3.BL
 {
     public class ContactPerson
     {
@@ -9,8 +9,8 @@
             Email = email;
         }
 
-        public string Municipality { get; set; }
-        public string County { get; set; }
-        public string Email { get; set; }
+        public string Municipality { get; }
+        public string County { get; }
+        public string Email { get; }
     }
 }

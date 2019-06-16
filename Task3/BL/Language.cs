@@ -1,4 +1,4 @@
-﻿namespace Task3
+﻿namespace Task3.BL
 {
     public class Language : ILanguage
     {
@@ -6,7 +6,6 @@
         {
             return EPiServer.Core.LanguageManager.Instance.Translate(xmlPath, GetCurrentLanguage());
         }
-
 
         public string GetCurrentLanguage()
         {
